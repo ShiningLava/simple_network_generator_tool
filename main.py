@@ -1,12 +1,5 @@
 import yaml
 import random
-#import json
-#import argparse
-
-#VERSION = "1.1.0"
-
-#with open('config.json', 'r') as g:
-#    config = json.load(g)
 
 sites = random.randrange(1, 3)
 pc_endpoints = random.randrange(3, 25)
@@ -18,29 +11,46 @@ camera_traits = ["customer rating", "outside", "inside", "bullet", "cloud manage
 network_equipment_budget = sites * random.randrange(3500, 7500)
 network_equipment_vendor = ["cisco", "juniper", "palo alto", "ubiquiti"]
 
-## may need to change this to specific devices
-## ie printers_created, or phones_created, etc
-vms_created = 0
-vms_to_be_created = 0
+class vars_joined_for_yml_output:
+    def __init__(self, sites, pc_endpoints, printers, telephones, cameras):
+        self.sites = sites
+        self.pc_endpoints = pc_endpoints
+        self.printers = printers
+        self.telephones = telephones
+        self.cameras = cameras
 
-## other variables from NCS:
-## sites = 
-## pc_endpoints = 
-## printers = 
-## telephones = 
-## cameras = 
+    def vars_together(self):
+        print(f"sites: {self.sites}\npc_endpoints: {self.pc_endpoints}\nprinters: {printers}\ntelephones: {telephones}\ncameras: {cameras}")
 
-#def add_sites_to_config(sites):
-    ## each site will add:
-    ## at least one router
-    ## at least one printer
-    ## at least three pc_endpoints
-    ## at least two telephones
-    ## at least four cameras
+all_vars = vars_joined_for_yml_output(sites, pc_endpoints, printers, telephones, cameras)
+all_vars.vars_together()
+
+def create_vm_config(*args):
+    ## create yaml entry custom for each device
+
+    ## determine last_octet of IP address starting with .10, capping at arg
+    printers = args[0]
+    printers_created = args[1]
+    last_octet_cap = printers
+    starting_last_octet_value = 10
+    last_octet_counter = args[2]
+    device_type = args[3]
+    last_octet = starting_last_octet_value + last_octet_counter
+    print(f"{device_type} {printers_created} last octet = {last_octet}")
+
 
 def add_printers_to_config(printers):
-    ##
     print(f"printers: {printers}")
+    printers_created = 1
+    last_octet_counter = 0
+    device_type = "printer"
+
+    ## append new machine to yaml config for each device
+    while printers_created <= printers:
+        print(f"creating printer {printers_created}")
+        create_vm_config(printers, printers_created, last_octet_counter, device_type)
+        printers_created += 1
+        last_octet_counter += 1
 
 def add_telephones_to_config(telephones):
     ##
@@ -58,29 +68,30 @@ def add_cameras_to_config(cameras):
     ## this is the function to create a new config entry to be added to yaml config
     ## currently all device types will create the same VM template
     ## may change this in the future
-    
 
-## this might need to be changed to less than or equal to
-while vms_created < vms_to_be_created:
-    ## This should add a new entry into the final yaml for each VM specified
-    ## ie If vms_to_be_created is 10, this should create 10 VMs in config.yaml
-    add_vm_to_config()
+def output_to_yaml():
+    print(f"SAMPLE YAML OUTPUT")
 
-    ## increment the vms_created counter until the desired number of VMs are defined
-    vms_created += 1
+    ## take the variables from the previous functions, concatenate them into a new variable
+    ## dump the new variable to config.yml
+    #full_config = 
 
-    ## may need to change to great than or equal to vm_number
-    if vms_created == vms_to_be_created:
-        break
+    #with open('config.yml', 'w') as file:
+      #yaml.dump(ludus, file)
 
 ## output yaml file (final output preview)
 ## ludus_config should be changed to include the index number of the VM being created
 ## ie ludus_config_1, or ludus_config_7
 ## index number should effect vn_name, hostname, ip_last_octet
-ludus_config = """
+
+## This outputs single apostrophe instead of desired double quotes
+## Unsure if this will affect the result when using config.yml for LUDUS
+vm_name = "{{ range_id }}-ad-dc-win2022-server-x64"
+hostname = "{{ range_id }}-DC01-2022"
+ludus_config = f"""
 ludus:
-  - vm_name: "{{ range_id }}-ad-dc-win2022-server-x64"
-    hostname: "{{ range_id }}-DC01-2022"
+  - vm_name: \"{vm_name}\"
+    hostname: \"{hostname}\"
     template: win2022-server-x64-template
     vlan: 10
     ip_last_octet: 11
@@ -108,6 +119,7 @@ def main():
     add_pc_endpoints_to_config(pc_endpoints)
     add_cameras_to_config(cameras)
     #add_vms_to_config()
+    output_to_yaml()
 
 if __name__ == "__main__":
     main()
