@@ -29,32 +29,45 @@ def create_vm_config(*args):
     ## create yaml entry custom for each device
 
     ## determine last_octet of IP address starting with .10, capping at arg
-    printers = args[0]
-    printers_created = args[1]
-    last_octet_cap = printers
+    device_number = args[0]
+    devices_created = args[1]
+    last_octet_cap = device_number
     starting_last_octet_value = 10
     last_octet_counter = args[2]
     device_type = args[3]
     last_octet = starting_last_octet_value + last_octet_counter
-    print(f"{device_type} {printers_created} last octet = {last_octet}")
+    print(f"{device_type} {devices_created} last octet = {last_octet}\n")
 
 
 def add_printers_to_config(printers):
-    print(f"printers: {printers}")
-    printers_created = 1
+    devices_created = 1
     last_octet_counter = 0
     device_type = "printer"
+    print(f"printers: {printers}")
 
     ## append new machine to yaml config for each device
-    while printers_created <= printers:
-        print(f"creating printer {printers_created}")
-        create_vm_config(printers, printers_created, last_octet_counter, device_type)
-        printers_created += 1
+    while devices_created <= printers:
+        print(f"creating {device_type} {devices_created}")
+
+        ## arguments given to create_vm_config() must be in this order
+        create_vm_config(printers, devices_created, last_octet_counter, device_type)
+        devices_created += 1
         last_octet_counter += 1
 
 def add_telephones_to_config(telephones):
-    ##
-    print(f"telephones: {telephones}")
+    devices_created = 1
+    last_octet_counter = 0
+    device_type = "telephone"
+    print(f"{device_type}: {telephones}")
+
+    ## append new machine to yaml config for each device
+    while devices_created <= telephones:
+        print(f"creating {device_type} {devices_created}")
+
+        ## arguments given to create_vm_config() must be in this order
+        create_vm_config(telephones, devices_created, last_octet_counter, device_type)
+        devices_created += 1
+        last_octet_counter += 1
 
 def add_pc_endpoints_to_config(pc_endpoints):
     ##
