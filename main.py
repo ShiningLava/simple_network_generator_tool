@@ -21,11 +21,13 @@ class Windows:
 
 class Domain:
 
+    ## will add option for other domains in the future
     fqdn = 'ludus.domain'
-    def __init__(self):
-        self.roles = []
-    def add_role(self, role):
-        self.roles.append(role)
+    role = 'primary-dc'
+    #def __init__(self):
+        #self.role = []
+    #def add_role(self, role):
+        #self.role.append(role)
 
 class Testing:
 
@@ -49,7 +51,8 @@ def create_vm_config(*args):
     last_octet_cap = device_number
     starting_last_octet_value = 10
     last_octet = starting_last_octet_value + last_octet_counter
-    yaml_output = []
+    #yaml_initiator = "ludus:"
+    yaml_output = {'ludus': []}
 
     ## ludus_config should be changed to include the index number of the VM being created
     ## ie ludus_config_1, or ludus_config_7
@@ -59,35 +62,37 @@ def create_vm_config(*args):
     ## Unsure if this will affect the result when using config.yml for LUDUS
     vm_name = "{{ range_id }}-ad-dc-win2022-server-x64"
     hostname = "{{ range_id }}-DC01-2022"
+    template = "win2022-server-x64-template"
 
     ## Order of yamp_output entry should be vm_name, hostname, template, vlan, ip_last_octet,
     ## ram_gb, cpus, windows, domain, linux, testing
 
-    yaml_output.append(f"vm_name: {vm_name}")
-    yaml_output.append(f"hostname: {hostname}")
+    yaml_output = {}
+    yaml_output.setdefault('ludus', [])
+    print(yaml_output)
 
-    ## Template not yet defined
-    #yaml_output.append(f"template")
-
-    yaml_output.append(f"vlan: {vlan}")
-    yaml_output.append(f"ip_last_octet: {last_octet}")
-    yaml_output.append(f"ram_gb: 4")
-    yaml_output.append(f"cpus: 2")
-
-
-    ## Need to add domain attributes to a nested list in yaml_output for windows:
     dc = Domain()
+    domain_dict = {}
+    domain_dict.update({'fqdn': dc.fqdn})
 
-    yaml_output.append(dc.fqdn)
+    #dc.add_role('primary-dc')
+    #yaml_output.append(f"{dc.roles}")
+    domain_dict.update({'role': dc.role})
+    print(domain_dict)
 
-    dc.add_role('primary-dc')
-    yaml_output.append(f"{dc.roles}")
+    ## Create vm_dict and add keys and values to it to it
+    vm_dict = {}
+    vm_dict.update({'vm_name': vm_name})
+    vm_dict.update({'hostname': hostname})
+    vm_dict.update({'template': template})
+    vm_dict.update({'vlan': vlan})
+    vm_dict.update({'ip_last_octet': last_octet})
 
-    x = Testing(0)
-    if not x:
-        yaml_output.append('x is false')
-    else:
-        yaml_output.append("testing")
+    ## append the previous dicts to vm_list list
+    yaml_output['ludus'].append(vm_dict)
+
+
+    #yaml_output['ludus'].append(domain_dict)
 
     print(f"{yaml_output}\n")
 
