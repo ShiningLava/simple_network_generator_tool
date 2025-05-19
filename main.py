@@ -11,6 +11,11 @@ camera_traits = ["customer rating", "outside", "inside", "bullet", "cloud manage
 network_equipment_budget = sites * random.randrange(3500, 7500)
 network_equipment_vendor = ["cisco", "juniper", "palo alto", "ubiquiti"]
 
+yaml_initiator = {'ludus': []}
+## set defaults for config file
+with open('config.yml', 'w') as file:
+    yaml.safe_dump(yaml_initiator, file)
+
 class Windows:
 
     def __init__(self):
@@ -40,6 +45,27 @@ class Testing:
     def __bool__(self):
          return self.val != 0
 
+def print_configs_to_config(vm_dict):
+    #yaml_initiator = {'ludus': []}
+
+    ## set defaults for config file
+    #with open('config.yml', 'w') as file:
+        #yaml.safe_dump(yaml_initiator, file)
+
+    ## print yaml_output for testing
+    #print(yaml_output)
+
+    ## load current config.yml file
+    with open('config.yml', 'r') as file:
+        yaml_current = yaml.safe_load(file)
+        yaml_current['ludus'].append(vm_dict)
+        #yaml_current += yaml.safe_dump(yaml_output)
+
+    ## append yaml_output for each VM to config.yml
+    if yaml_current:
+        with open('config.yml', 'w') as file:
+            yaml.safe_dump(yaml_current, file)
+        
 def create_vm_config(*args):
     ## create yaml entry custom for each device
     ## determine last_octet of IP address starting with .10, capping at arg
@@ -51,8 +77,8 @@ def create_vm_config(*args):
     last_octet_cap = device_number
     starting_last_octet_value = 10
     last_octet = starting_last_octet_value + last_octet_counter
-    #yaml_initiator = "ludus:"
-    yaml_output = {'ludus': []}
+    cpus = 2
+    ram_gb = 4
 
     ## ludus_config should be changed to include the index number of the VM being created
     ## ie ludus_config_1, or ludus_config_7
@@ -60,8 +86,10 @@ def create_vm_config(*args):
 
     ## This outputs single apostrophe instead of desired double quotes
     ## Unsure if this will affect the result when using config.yml for LUDUS
-    vm_name = "{{ range_id }}-ad-dc-win2022-server-x64"
-    hostname = "{{ range_id }}-DC01-2022"
+    vm_name_filler = "{{ range_id }}"
+    vm_name = f"{vlan}-{last_octet}-{vm_name_filler}-ad-dc-win2022-server-x64"
+    hostname_filler = "{{ range_id }}"
+    hostname = f"{vlan}-{last_octet}-{hostname_filler}-DC01-2022"
     template = "win2022-server-x64-template"
 
     ## Order of yamp_output entry should be vm_name, hostname, template, vlan, ip_last_octet,
@@ -69,8 +97,10 @@ def create_vm_config(*args):
 
     yaml_output = {}
     yaml_output.setdefault('ludus', [])
-    print(yaml_output)
+    #print(yaml_output)
 
+
+    ## Need to append this dict to vm_dict
     dc = Domain()
     domain_dict = {}
     domain_dict.update({'fqdn': dc.fqdn})
@@ -80,6 +110,11 @@ def create_vm_config(*args):
     domain_dict.update({'role': dc.role})
     print(domain_dict)
 
+    ## Add windows tasks
+    win = Windows()
+    win_dict = {}
+    win_dict.update({'sysprep': False})
+
     ## Create vm_dict and add keys and values to it to it
     vm_dict = {}
     vm_dict.update({'vm_name': vm_name})
@@ -87,13 +122,13 @@ def create_vm_config(*args):
     vm_dict.update({'template': template})
     vm_dict.update({'vlan': vlan})
     vm_dict.update({'ip_last_octet': last_octet})
+    vm_dict.update({'domain': domain_dict})
+    vm_dict.update({'cpus': cpus})
+    vm_dict.update({'ram_gb': ram_gb})
+    vm_dict.update({'windows': win_dict})
 
-    ## append the previous dicts to vm_list list
-    yaml_output['ludus'].append(vm_dict)
-
-
-    #yaml_output['ludus'].append(domain_dict)
-
+    #print_configs_to_config(yaml_output)
+    print_configs_to_config(vm_dict)
     print(f"{yaml_output}\n")
 
     ## Need to implement an append to config file for yaml_output list
