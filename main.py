@@ -12,6 +12,13 @@ network_equipment_budget = sites * random.randrange(3500, 7500)
 network_equipment_vendor = ["cisco", "juniper", "palo alto", "ubiquiti"]
 
 yaml_initiator = {'ludus': [], 'network': []}
+
+## Create network_dict and set defaults
+network_dict = {}
+network_dict.update({'inter_vlan_default': 'REJECT'})
+network_dict.update({'rules': 'network_rules placeholder'})
+#print(network_dict)
+
 ## set defaults for config file
 with open('config.yml', 'w') as file:
     yaml.safe_dump(yaml_initiator, file)
@@ -46,26 +53,26 @@ class Testing:
          return self.val != 0
 
 def print_configs_to_config(vm_dict):
-    #yaml_initiator = {'ludus': []}
-
-    ## set defaults for config file
-    #with open('config.yml', 'w') as file:
-        #yaml.safe_dump(yaml_initiator, file)
-
-    ## print yaml_output for testing
-    #print(yaml_output)
-
     ## load current config.yml file
     with open('config.yml', 'r') as file:
         yaml_current = yaml.safe_load(file)
         yaml_current['ludus'].append(vm_dict)
-        #yaml_current += yaml.safe_dump(yaml_output)
 
     ## append yaml_output for each VM to config.yml
     if yaml_current:
         with open('config.yml', 'w') as file:
             yaml.safe_dump(yaml_current, file)
-        
+
+def print_networks_to_config(network_dict):
+    ## load current config.yml file and append network_dict
+    with open('config.yml', 'r') as file:
+        yaml_current = yaml.safe_load(file)
+        yaml_current['network'].append(network_dict)
+
+    if yaml_current:
+        with open('config.yml', 'w') as file:
+            yaml.safe_dump(yaml_current, file)
+
 def create_vm_config(*args):
     ## create yaml entry custom for each device
     ## determine last_octet of IP address starting with .10, capping at arg
@@ -97,16 +104,11 @@ def create_vm_config(*args):
 
     yaml_output = {}
     yaml_output.setdefault('ludus', [])
-    #print(yaml_output)
-
 
     ## Need to append this dict to vm_dict
     dc = Domain()
     domain_dict = {}
     domain_dict.update({'fqdn': dc.fqdn})
-
-    #dc.add_role('primary-dc')
-    #yaml_output.append(f"{dc.roles}")
     domain_dict.update({'role': dc.role})
     print(domain_dict)
 
@@ -115,7 +117,7 @@ def create_vm_config(*args):
     win_dict = {}
     win_dict.update({'sysprep': False})
 
-    ## Create vm_dict and add keys and values to it to it
+    ## Create vm_dict and add keys and values to it
     vm_dict = {}
     vm_dict.update({'vm_name': vm_name})
     vm_dict.update({'hostname': hostname})
@@ -127,9 +129,8 @@ def create_vm_config(*args):
     vm_dict.update({'ram_gb': ram_gb})
     vm_dict.update({'windows': win_dict})
 
-    #print_configs_to_config(yaml_output)
     print_configs_to_config(vm_dict)
-    print(f"{yaml_output}\n")
+    #print_networks_to_config(network_dict)
 
     ## Need to implement an append to config file for yaml_output list
     ## Might need to add another list that contains all of the yaml_outputs for each VM
@@ -207,6 +208,7 @@ def main():
     add_telephones_to_config(telephones)
     add_pc_endpoints_to_config(pc_endpoints)
     add_cameras_to_config(cameras)
+    print_networks_to_config(network_dict)
 
 if __name__ == "__main__":
     main()
