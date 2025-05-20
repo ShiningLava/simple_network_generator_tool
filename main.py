@@ -11,7 +11,7 @@ camera_traits = ["customer rating", "outside", "inside", "bullet", "cloud manage
 network_equipment_budget = sites * random.randrange(3500, 7500)
 network_equipment_vendor = ["cisco", "juniper", "palo alto", "ubiquiti"]
 
-yaml_initiator = {'ludus': []}
+yaml_initiator = {'ludus': [], 'network': []}
 ## set defaults for config file
 with open('config.yml', 'w') as file:
     yaml.safe_dump(yaml_initiator, file)
