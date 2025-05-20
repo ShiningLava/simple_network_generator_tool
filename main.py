@@ -16,8 +16,18 @@ yaml_initiator = {'ludus': [], 'network': []}
 ## Create network_dict and set defaults
 network_dict = {}
 network_dict.update({'inter_vlan_default': 'REJECT'})
-network_dict.update({'rules': 'network_rules placeholder'})
-#print(network_dict)
+
+## Create network_rules dictionary and update it with ACLs
+## Should probably create a function and move all of this network stuff to it
+## network should have a rules dictionary for each VLAN present
+network_rules = {}
+network_rules.update({'name': 'NAME_PLACEHOLDER'})
+network_rules.update({'vlan_src': 'VLAN_SRC PLACEHOLDER'})
+network_rules.update({'vlan_dst': 'VLAN_DST_PLACEHOLDER'})
+network_rules.update({'protocol': 'PROTOCOL_PLACEHOLDER'})
+network_rules.update({'ports': 'PORTS_PLACEHOLDER'})
+network_rules.update({'action': 'ACTION_PLACEHOLDER'})
+network_dict.update({'rules': network_rules})
 
 ## set defaults for config file
 with open('config.yml', 'w') as file:
