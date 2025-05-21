@@ -17,17 +17,15 @@ yaml_initiator = {'ludus': [], 'network': []}
 network_dict = {}
 network_dict.update({'inter_vlan_default': 'REJECT'})
 
+network_rules_dict = {}
+
 ## Create network_rules dictionary and update it with ACLs
 ## Should probably create a function and move all of this network stuff to it
-## network should have a rules dictionary for each VLAN present
+## network_rules should have an entry specifically for each vlan
+## network_rules should probably be a list instead of a dictionary
+## perhaps set an ACL default for each for basic inter-VM comms, 
+## but only actually append the ACL if the vlan is present in the output of vlan_dict
 network_rules = {}
-network_rules.update({'name': 'NAME_PLACEHOLDER'})
-network_rules.update({'vlan_src': 'VLAN_SRC PLACEHOLDER'})
-network_rules.update({'vlan_dst': 'VLAN_DST_PLACEHOLDER'})
-network_rules.update({'protocol': 'PROTOCOL_PLACEHOLDER'})
-network_rules.update({'ports': 'PORTS_PLACEHOLDER'})
-network_rules.update({'action': 'ACTION_PLACEHOLDER'})
-network_dict.update({'rules': network_rules})
 
 ## set defaults for config file
 with open('config.yml', 'w') as file:
@@ -50,6 +48,15 @@ class Domain:
         #self.role = []
     #def add_role(self, role):
         #self.role.append(role)
+
+class Network:
+
+    ## inter_vlan_default can be changed later on to be more dynamic
+    inter_vlan_default = 'REJECT'
+    def __init__(self):
+        self.rules = {'name': 'NAME_PLACEHOLDER'}
+    def add_rule(self, rule):
+        self.rule.append(rule)
 
 class Testing:
 
@@ -82,6 +89,28 @@ def print_networks_to_config(network_dict):
     if yaml_current:
         with open('config.yml', 'w') as file:
             yaml.safe_dump(yaml_current, file)
+
+def create_network_config(*args):
+    ## this function creates the network configs and sends the proper arguments to print_networks_to_config
+    #if args[0]:
+        #vlan = args[0]
+    # arg2 = args[1]
+    # arg3 = args[2]
+    # arg4 = args[3]
+
+    network = Network()
+    #if vlan == 10:
+        #print("vlan 10 FOUND INITIATING RULES KERCHOW")
+        #network_rules_dict.update({'name': 'NAME_PLACEHOLDER'})
+        #network_rules_dict.update({'vlan_src': 'VLAN_SRC PLACEHOLDER'})
+        #network_rules_dict.update({'vlan_dst': 'VLAN_DST_PLACEHOLDER'})
+        #network_rules_dict.update({'protocol': 'PROTOCOL_PLACEHOLDER'})
+        #network_rules_dict.update({'ports': 'PORTS_PLACEHOLDER'})
+        #network_rules_dict.update({'action': 'ACTION_PLACEHOLDER'})
+        #network_dict.update({'rules': network_rules_dict})
+
+    #network_dict.update({'rules': network_rules})
+    print_networks_to_config(network_dict)
 
 def create_vm_config(*args):
     ## create yaml entry custom for each device
@@ -140,7 +169,7 @@ def create_vm_config(*args):
     vm_dict.update({'windows': win_dict})
 
     print_configs_to_config(vm_dict)
-    #print_networks_to_config(network_dict)
+   # create_network_config(vlan)
 
     ## Need to implement an append to config file for yaml_output list
     ## Might need to add another list that contains all of the yaml_outputs for each VM
@@ -213,12 +242,16 @@ def output_to_yaml():
       #yaml.dump(ludus, file)
 
 def main():
+    global network_dict
     #add_sites_to_config(sites)
     add_printers_to_config(printers)
     add_telephones_to_config(telephones)
     add_pc_endpoints_to_config(pc_endpoints)
     add_cameras_to_config(cameras)
-    print_networks_to_config(network_dict)
+    #print_networks_to_config(network_dict)
+
+    #global vlan
+    create_network_config()
 
 if __name__ == "__main__":
     main()
