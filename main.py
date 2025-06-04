@@ -12,35 +12,10 @@ camera_traits = ["customer rating", "outside", "inside", "bullet", "cloud manage
 network_equipment_budget = sites * random.randrange(3500, 7500)
 network_equipment_vendor = ["cisco", "juniper", "palo alto", "ubiquiti"]
 
-## Generating network list may cause formatting error later on
-#yaml_initiator = {'ludus': [], 'network': []}
 yaml_initiator = {'ludus': [], 'network': {'inter_vlan_default': 'ACCEPT'}}
 
 ## Create network_dict and set defaults
 network_dict = {}
-#inter_vlan_default_value = "'inter_vlan_default': 'ACCEPT'"
-## append inter_vlan default ruleset
-## this appends inter_vlan_default to network_dict, which is wrong data format
-## results in error "invalid YAML: network: Invalid type. Expected: object, given: array"
-#network_dict.update('inter_vlan_default': 'ACCEPT')
-
-#network_dict.update(inter_vlan_default='ACCEPT')
-
-## network_list attempts to fix the above error
-#network_list = []
-#inter_vlan_default_keypair = 'inter_vlan_default: ACCEPT'
-#network_list.append(inter_vlan_default_keypair)
-#network_list.append(('inter_vlan_default', 'ACCEPT'))
-
-#network_rules_dict = {}
-
-## Create network_rules dictionary and update it with ACLs
-## Should probably create a function and move all of this network stuff to it
-## network_rules should have an entry specifically for each vlan
-## network_rules should probably be a list instead of a dictionary
-## perhaps set an ACL default for each for basic inter-VM comms, 
-## but only actually append the ACL if the vlan is present in the output of vlan_dict
-#network_rules = {}
 
 ## set defaults for config file
 with open('config.yml', 'w') as file:
@@ -99,9 +74,6 @@ def print_networks_to_config(network_dict):
     ## load current config.yml file and append network_dict
     with open('config.yml', 'r') as file:
         yaml_current = yaml.safe_load(file)
-        #yaml_current = 
-        #yaml_current['network'].append(network_dict)
-        #yaml_current['network'].append(network_list)
 
     if yaml_current:
         with open('config.yml', 'w') as file:
@@ -109,24 +81,6 @@ def print_networks_to_config(network_dict):
 
 def create_network_config(*args):
     ## this function creates the network configs and sends the proper arguments to print_networks_to_config
-    #if args[0]:
-        #vlan = args[0]
-    # arg2 = args[1]
-    # arg3 = args[2]
-    # arg4 = args[3]
-
-    #network = Network()
-    #if vlan == 10:
-        #print("vlan 10 FOUND INITIATING RULES KERCHOW")
-        #network_rules_dict.update({'name': 'NAME_PLACEHOLDER'})
-        #network_rules_dict.update({'vlan_src': 'VLAN_SRC PLACEHOLDER'})
-        #network_rules_dict.update({'vlan_dst': 'VLAN_DST_PLACEHOLDER'})
-        #network_rules_dict.update({'protocol': 'PROTOCOL_PLACEHOLDER'})
-        #network_rules_dict.update({'ports': 'PORTS_PLACEHOLDER'})
-        #network_rules_dict.update({'action': 'ACTION_PLACEHOLDER'})
-        #network_dict.update({'rules': network_rules_dict})
-
-    #network_dict.update({'rules': network_rules})
     print_networks_to_config(network_dict)
 
 def create_vm_config(*args):
@@ -186,10 +140,6 @@ def create_vm_config(*args):
     vm_dict.update({'windows': win_dict})
 
     print_configs_to_config(vm_dict)
-   # create_network_config(vlan)
-
-    ## Need to implement an append to config file for yaml_output list
-    ## Might need to add another list that contains all of the yaml_outputs for each VM
 
 def add_printers_to_config(printers):
     devices_created = 1
@@ -243,29 +193,12 @@ def add_cameras_to_config(cameras):
     ##
     print(f"cameras: {cameras}")
 
-#def add_vms_to_config():
-    ## this is the function to create a new config entry to be added to yaml config
-    ## currently all device types will create the same VM template
-    ## may change this in the future
-
-def output_to_yaml():
-    print(f"SAMPLE YAML OUTPUT")
-
-    ## take the variables from the previous functions, concatenate them into a new variable
-    ## dump the new variable to config.yml
-    #full_config = 
-
-    #with open('config.yml', 'w') as file:
-      #yaml.dump(ludus, file)
-
 def main():
     global network_dict
-    #add_sites_to_config(sites)
     add_printers_to_config(printers)
     add_telephones_to_config(telephones)
     add_pc_endpoints_to_config(pc_endpoints)
     add_cameras_to_config(cameras)
-    #print_networks_to_config(network_dict)
 
     #global vlan
     create_network_config()
