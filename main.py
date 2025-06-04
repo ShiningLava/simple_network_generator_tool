@@ -1,3 +1,4 @@
+
 import yaml
 import random
 
@@ -11,13 +12,27 @@ camera_traits = ["customer rating", "outside", "inside", "bullet", "cloud manage
 network_equipment_budget = sites * random.randrange(3500, 7500)
 network_equipment_vendor = ["cisco", "juniper", "palo alto", "ubiquiti"]
 
-yaml_initiator = {'ludus': [], 'network': []}
+## Generating network list may cause formatting error later on
+#yaml_initiator = {'ludus': [], 'network': []}
+yaml_initiator = {'ludus': [], 'network': {'inter_vlan_default': 'ACCEPT'}}
 
 ## Create network_dict and set defaults
 network_dict = {}
-network_dict.update({'inter_vlan_default': 'REJECT'})
+#inter_vlan_default_value = "'inter_vlan_default': 'ACCEPT'"
+## append inter_vlan default ruleset
+## this appends inter_vlan_default to network_dict, which is wrong data format
+## results in error "invalid YAML: network: Invalid type. Expected: object, given: array"
+#network_dict.update('inter_vlan_default': 'ACCEPT')
 
-network_rules_dict = {}
+#network_dict.update(inter_vlan_default='ACCEPT')
+
+## network_list attempts to fix the above error
+#network_list = []
+#inter_vlan_default_keypair = 'inter_vlan_default: ACCEPT'
+#network_list.append(inter_vlan_default_keypair)
+#network_list.append(('inter_vlan_default', 'ACCEPT'))
+
+#network_rules_dict = {}
 
 ## Create network_rules dictionary and update it with ACLs
 ## Should probably create a function and move all of this network stuff to it
@@ -25,7 +40,7 @@ network_rules_dict = {}
 ## network_rules should probably be a list instead of a dictionary
 ## perhaps set an ACL default for each for basic inter-VM comms, 
 ## but only actually append the ACL if the vlan is present in the output of vlan_dict
-network_rules = {}
+#network_rules = {}
 
 ## set defaults for config file
 with open('config.yml', 'w') as file:
@@ -84,7 +99,9 @@ def print_networks_to_config(network_dict):
     ## load current config.yml file and append network_dict
     with open('config.yml', 'r') as file:
         yaml_current = yaml.safe_load(file)
-        yaml_current['network'].append(network_dict)
+        #yaml_current = 
+        #yaml_current['network'].append(network_dict)
+        #yaml_current['network'].append(network_list)
 
     if yaml_current:
         with open('config.yml', 'w') as file:
@@ -98,7 +115,7 @@ def create_network_config(*args):
     # arg3 = args[2]
     # arg4 = args[3]
 
-    network = Network()
+    #network = Network()
     #if vlan == 10:
         #print("vlan 10 FOUND INITIATING RULES KERCHOW")
         #network_rules_dict.update({'name': 'NAME_PLACEHOLDER'})
@@ -252,6 +269,11 @@ def main():
 
     #global vlan
     create_network_config()
+
+    ## Print summary of command
+    ## add in machines as I continue support for them
+    total_items_created = printers + telephones + pc_endpoints
+    print(f"created {total_items_created}")
 
 if __name__ == "__main__":
     main()
